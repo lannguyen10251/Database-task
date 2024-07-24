@@ -1,0 +1,106 @@
+create database CSDL;
+use CSDL;
+go
+
+create table CUSTOMERS (
+CustomerID INT PRIMARY KEY,
+CustomerName VARCHAR(255),
+ContactName VARCHAR(255),
+Address VARCHAR(255),
+City VARCHAR(255),
+Country VARCHAR(255)
+);
+
+create table ORDERS (
+OrderID INT PRIMARY KEY,
+CustomerID INT,
+OrderDate DATE,
+TotalAmount DECIMAL(10, 2),
+CONSTRAINT FK_CustomerOrders FOREIGN KEY (CustomerID)
+REFERENCES Customers(CustomerID)
+);
+
+create table PRODUCTS (
+ProductID INT PRIMARY KEY,
+ProductName VARCHAR(255),
+Category VARCHAR(255),
+Price DECIMAL(10, 2),
+StockQuantity INT
+);
+
+create table EMPLOYEES (
+EmployeeID int PRIMARY KEY,
+ManagerID INT,
+FirstName VARCHAR(255),
+LastName VARCHAR(255),
+BirthDate DATE,
+Department VARCHAR(255),
+Salary DECIMAL(10, 2)
+);
+
+insert into EMPLOYEES (EmployeeID, ManagerID,  FirstName, LastName, BirthDate, Department, Salary) values ('312310001', '100','Nguyen', 'Duong Phong', '2005-04-22', '30', '7091000.67');
+insert into EMPLOYEES (EmployeeID, ManagerID,  FirstName, LastName, BirthDate, Department, Salary) values ('312310002', '101','Duong', 'Manh Duc', '2005-04-22', '30', '8056000.12');
+insert into EMPLOYEES (EmployeeID, ManagerID,  FirstName, LastName, BirthDate, Department, Salary) values ('312310003', '102','Nguyen', 'Viet Quang', '2005-04-22', '30', '9870000.09');
+insert into EMPLOYEES (EmployeeID, ManagerID,  FirstName, LastName, BirthDate, Department, Salary) values ('312310004', '103','Trinh', 'Manh Quynh', '2005-04-22', '30', '5300000.45');
+insert into EMPLOYEES (EmployeeID, ManagerID,  FirstName, LastName, BirthDate, Department, Salary) values ('312310005', '104','Ho', 'Danh', '2005-04-22', '30', '4067000.70');
+update EMPLOYEES set ManagerID = NULL where EmployeeID = '312310001';
+
+insert into orders (OrderID, CustomerID, OrderDate, TotalAmount) values ('100', '0001', '2024-02-21', '40');
+insert into orders (OrderID, CustomerID, OrderDate, TotalAmount) values ('101', '0002', '2023-12-21', '35');
+insert into orders (OrderID, CustomerID, OrderDate, TotalAmount) values ('102', '0003', '2023-11-21', '20');
+insert into orders (OrderID, CustomerID, OrderDate, TotalAmount) values ('103', '0004', '2023-12-21', '63');
+insert into orders (OrderID, CustomerID, OrderDate, TotalAmount) values ('104', '0005', '2024-01-21', '52');
+update orders set TotalAmount = NULL where CustomerID = '0005';
+update orders set CustomerID = NULL where OrderID = '104';
+
+insert into CUSTOMERS (CustomerID, CustomerName, ContactName, Address, City, Country) values ('0001', 'Tran Thu', 'Thu', 'so 5, duong 5, khu pho 1', 'Bien Hoa', 'Viet Nam'); 
+insert into CUSTOMERS (CustomerID, CustomerName, ContactName, Address, City, Country) values ('0002', 'Tran Do', 'Cong', 'so 9, duong 6, khu pho 2', 'Hue', 'Viet Nam'); 
+insert into CUSTOMERS (CustomerID, CustomerName, ContactName, Address, City, Country) values ('0003', 'Nguyen Binh', 'Khiem', 'so 12, duong 8, khu pho 5', 'Ha Noi', 'Viet Nam'); 
+insert into CUSTOMERS (CustomerID, CustomerName, ContactName, Address, City, Country) values ('0004', 'Nguyen Cong', 'Cong', 'so 67, duong 4, khu pho 8', 'Hai Phong', 'Viet Nam'); 
+insert into CUSTOMERS (CustomerID, CustomerName, ContactName, Address, City, Country) values ('0005', 'Duong Le', 'Lan', 'so 8, duong 10, khu pho 10', 'Ho Chi Minh', 'Viet Nam'); 
+
+insert into PRODUCTS (ProductID, ProductName, Category, Price, StockQuantity) values ('0101', 'laptop', 'dien tu', '9000000', '40');
+insert into PRODUCTS (ProductID, ProductName, Category, Price, StockQuantity) values ('0102', 'dien thoai', 'dien tu', '8200000', '20');
+insert into PRODUCTS (ProductID, ProductName, Category, Price, StockQuantity) values ('0103', 'tu lanh', 'do gia dung', '10000000', '52');
+insert into PRODUCTS (ProductID, ProductName, Category, Price, StockQuantity) values ('0104', 'bep', 'do gia dung', '19000000', '91');
+insert into PRODUCTS (ProductID, ProductName, Category, Price, StockQuantity) values ('0105', 'ban ghe', 'noi that', '8313000', '10');
+
+select*from EMPLOYEES;
+select*from CUSTOMERS;
+select*from orders;
+select*from PRODUCTS;
+
+--1
+select customerID, count(*) as donhang
+from orders
+group by customerID;
+--2
+select c.CustomerID, c.CustomerName, count(o.orderID) as numberof
+from CUSTOMERS c
+left join orders o on c.CustomerID = o.CustomerID
+group by c.CustomerID, c.CustomerName;
+--3
+select c.CustomerID, c.CustomerName, sum (o.TotalAmount) as tonggiatri
+from CUSTOMERS c
+left join orders o ON c.CustomerID = o.CustomerID
+group by c.CustomerID, c.CustomerName;
+--4
+select distinct c.CustomerID, c.CustomerName
+from CUSTOMERS c
+inner join orders o ON c.CustomerID = o.CustomerID;
+--5 
+select c.CustomerID, c.CustomerName
+from CUSTOMERS c
+left join orders o ON c.CustomerID = o.CustomerID
+where o.customerID is NULL;
+--6
+with truyvan as (
+select EmployeeID, ManagerID, FirstName, LastName
+from EMPLOYEES
+where ManagerID is not NUll
+union all 
+select e.EmployeeID, e.ManagerID, e.FirstName, e.LastName
+from EMPLOYEES e
+inner join truyvan t on e.ManagerID = t.EmployeeID
+)
+select*from truyvan;

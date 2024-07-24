@@ -1,0 +1,209 @@
+﻿create database sinhvienueh
+use sinhvienueh
+go
+
+--tạo bảng sinh viên gồm các cột mã sinh viên, tên sinh viên, mã lớp
+CREATE TABLE sinhvien
+	(
+	masinhvien nvarchar(10) primary key, -- khóa chính
+	tensinhvien nvarchar(100),
+	malop nvarchar(10) references lophoc(malop) -- khóa ngoại
+	)
+
+--tạo bảng lop hoc gồm các cột mã lớp, tên lớp, tổng số (ràng buộc tổng số không được lớn hớn 50)
+CREATE TABLE lophoc 
+	(
+	malop nvarchar(10) primary key, -- khóa chính
+	tenlop nvarchar(100),
+	tongso int,
+	constraint tschk check (tongso < 50) -- ràng buộc giá trị
+	)
+
+--tạo bảng mon học gồm các cột mã môn, tên môn
+CREATE TABLE monhoc 
+	(
+	mamon nvarchar(10) primary key,
+	tenmon nvarchar(100)
+	)
+
+--tạo bảng diem gồm các cột mã sinh viên (tham chiếu khóa chính trong bảng sinhvien, 
+--tên môn (tham chiếu đến khóa chính trong bảng môn học), điểm
+CREATE TABLE diem 
+	(
+	masinhvien nvarchar(10) references sinhvien(masinhvien),
+	mamon nvarchar(10) references monhoc(mamon), 
+	diem decimal (3,1),
+	constraint kchinh primary key (masinhvien, mamon)
+	)
+
+--tạo bảng sinh viên gồm các cột mã sinh viên (tham chiếu khóa chính trong bảng sinhvien, 
+--ma lớp (tham chiếu đến khóa chính trong bảng lophoc), Tongso và các cột thông tin khác (không bắt buộc)
+CREATE TABLE DangKyHocPhan 
+	(
+    MaSinhVien nvarchar(10),
+    Malop nvarchar(10),
+    HocKy int,
+    NamHoc int,
+    Diem FLOAT,
+	Mamon nvarchar(10);
+    PRIMARY KEY (MaSinhVien, Malop, HocKy, NamHoc),
+    FOREIGN KEY (MaSinhVien) REFERENCES sinhvien(masinhvien),
+    FOREIGN KEY (Malop) REFERENCES lophoc(malop)
+	FOREIGN KEY (Mamon) REFERENCES monhoc(mamon),
+	);
+select * from DangKyHocPhan;
+alter table DangKyHocPhan add mamon nvarchar(10) 
+FOREIGN KEY (Mamon) REFERENCES monhoc(mamon);
+
+-- thêm cột Tongso vào bảng Dang ký học phần (do lúc code bảng bị quên)
+alter table DangKyHocPhan
+add Tongso int 
+constraint ts check (tongso < 50);
+
+--thêm dữ liệu cho bảng lớp học
+insert into lophoc (malop, tenlop, tongso) values ('607', 'CSDL', '44');
+insert into lophoc (malop, tenlop, tongso) values ('608', 'CSDL', '44');
+insert into lophoc (malop, tenlop, tongso) values ('609', 'CSDL', '44');
+insert into lophoc (malop, tenlop, tongso) values ('606', 'CSDL', '44');
+insert into lophoc (malop, tenlop, tongso) values ('605', 'CSDL', '44');
+insert into lophoc (malop, tenlop, tongso) values ('604', 'CSDL', '55');
+
+-- truy vấn tất cả các cột trong bảng lớp học
+select * from lophoc;
+
+
+--thêm dữ liệu cho bảng sinhvien
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1231020754', 'Nguyễn Phước Bình', '607');
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1231022480', 'Nguyễn Công Danh', '607');
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1231020869', 'Đinh Mạnh	Đức', '607');
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1231024646', 'Nguyễn Trần Quốc	Dũng', '607');
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1211027262', 'Nguyễn Thanh Lan', '607');
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1231021957', 'Nguyễn Dương Phong', '607');
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1231021844', 'Nguyễn Việt Quang', '607');
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1231022247', 'Trần Mạnh Quỳnh', '607');
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1231026392', 'Nguyễn Phước Tình', '607');
+insert into sinhvien (masinhvien, tensinhvien, malop) values ('1231022248', N'Trần Mạnh Quỳnh', '607');
+
+-- truy vấn tất cả các cột trong bảng sinh viên
+select * from sinhvien;
+
+
+--thêm dữ liệu cho bảng môn học
+insert into monhoc (mamon, tenmon) values ('1', 'Tạo cơ sở dữ liệu');
+insert into monhoc (mamon, tenmon) values ('2', 'Thêm thông tin vào bảng');
+insert into monhoc (mamon, tenmon) values ('3', 'Truy vấn dữ liệu');
+insert into monhoc (mamon, tenmon) values ('4', 'Vẽ ERD');
+insert into monhoc (mamon, tenmon) values ('5', 'Thêm xóa sửa thuộc tính dữ liệu');
+
+-- truy vấn tất cả các cột trong bảng môn học
+select * from monhoc;
+
+
+--thêm dữ liệu cho bảng điểm
+insert into diem (masinhvien, mamon, diem) values ('1231020754', '1', '10');
+insert into diem (masinhvien, mamon, diem) values ('1231022480', '1', '10');
+insert into diem (masinhvien, mamon, diem) values ('1231020869', '1', '10');
+insert into diem (masinhvien, mamon, diem) values ('1231024646', '1', '10');
+insert into diem (masinhvien, mamon, diem) values ('1211027262', '1', '10');
+insert into diem (masinhvien, mamon, diem) values ('1231021957', '1', '10');
+insert into diem (masinhvien, mamon, diem) values ('1231021844', '1', '10');
+insert into diem (masinhvien, mamon, diem) values ('1231022247', '1', '10');
+insert into diem (masinhvien, mamon, diem) values ('1231026392', '1', '10');
+
+--thêm dữ liệu vào bảng DangKyHocPhan
+insert into DangKyHocPhan (MaSinhVien, Malop, HocKy, NamHoc,  Tongso) 
+values ('1231020754', '607', '1', '2024','45');
+insert into DangKyHocPhan (MaSinhVien, Malop, HocKy, NamHoc) 
+values ('1231022480', '605', '1', '2024');
+insert into DangKyHocPhan (MaSinhVien, Malop, HocKy, NamHoc) 
+values ('1231020869', '605', '1', '2024');
+insert into DangKyHocPhan (MaSinhVien, Malop, HocKy, NamHoc) 
+values ('1231024646', '605', '1', '2024');
+insert into DangKyHocPhan (MaSinhVien, Malop, HocKy, NamHoc) 
+values ('1211027262', '605', '1', '2024');
+insert into DangKyHocPhan (MaSinhVien, Malop, HocKy, NamHoc) 
+values ('1231021957', '605', '1', '2024');
+insert into DangKyHocPhan (MaSinhVien, Malop, HocKy, NamHoc) 
+values ('1231021844', '605', '1', '2024');
+insert into DangKyHocPhan (MaSinhVien, Malop, HocKy, NamHoc) 
+values ('1231022480', '606', '1', '2024');
+insert into DangKyHocPhan (MaSinhVien, Malop, HocKy, NamHoc) 
+values ('1231022480', '607', '1', '2024');
+
+-- truy vấn tất cả các cột trong bảng điểm
+select * from diem;
+
+--update dữ liệu trong bảng sinhvien
+UPDATE sinhvien SET tensinhvien = N'Nguyễn Phước Bình' WHERE masinhvien = '1231020754';
+UPDATE sinhvien SET tensinhvien = N'Nguyễn Công Danh' WHERE masinhvien = '1231022480';
+UPDATE sinhvien SET tensinhvien = N'Đinh Mạnh	Đức' WHERE masinhvien = '1231020869';
+UPDATE sinhvien SET tensinhvien = N'Nguyễn Trần Quốc	Dũng' WHERE masinhvien = '1231024646';
+UPDATE sinhvien SET tensinhvien = N'Nguyễn Thanh Lan' WHERE masinhvien = '1211027262';
+UPDATE sinhvien SET tensinhvien = N'Nguyễn Dương Phong' WHERE masinhvien = '1231021957';
+UPDATE sinhvien SET tensinhvien = N'Nguyễn Việt Quang' WHERE masinhvien = '1231021844';
+UPDATE sinhvien SET tensinhvien = N'Trần Mạnh Quỳnh' WHERE masinhvien = '1231022247';
+UPDATE sinhvien SET tensinhvien = N'Nguyễn Phước Tình' WHERE masinhvien = '1231026392';
+
+
+-- truy vấn 2 cột mã số sinh viên và tên sinh viên trong bảng sinh viên
+SELECT masinhvien, tensinhvien FROM sinhvien;
+
+--truy vấn thông tin của sinh viên có mã số 1231020754
+SELECT masinhvien, tensinhvien,malop FROM sinhvien WHERE masinhvien='1231020754';
+
+--thêm cột ngày sinh vào bảng sinh viên
+ALTER TABLE sinhvien
+ADD NSinh nvarchar;
+
+--thay đổi tên cột NSinh thành ngaysinh 
+SP_RENAME 'sinhvien.NSinh', 'ngaysinh', 'COLUMN';
+
+--thay đổi kiểu dữ liệu của cột ngaysinh thành date
+ALTER TABLE sinhvien
+ALTER COLUMN ngaysinh date;
+
+--xóa cột ngaysinh
+ALTER TABLE sinhvien
+DROP COLUMN ngaysinh;
+
+--xóa 1 dòng
+delete from sinhvien where masinhvien = '1231022248';
+
+--xóa khóa ngoại của bảng sinh vien
+alter table diem drop constraint FK__diem__masinhvien__44FF419A;
+alter table sinhvien drop FK__sinhvien__malop__403A8C7D;
+
+--thêm lại khóa ngoại ma lop (được tham chiếu từ bảng lớp học) vào bảng sinh viên
+alter table sinhvien 
+add constraint malophoc 
+FOREIGN KEY (malop) references lophoc(malop);
+
+--thêm trường (cột) địa chỉ vào bảng sinh viên
+alter table sinhvien
+add diachi nvarchar (100);
+
+go
+select * from sinhvien;
+
+go
+
+
+--bổ sung thêm thông tin ngày sinh và địa chỉ vào bảng sinh viên
+update sinhvien set ngaysinh = '2005-06-27' 
+where masinhvien = '1231020754';
+select * from sinhvien;
+update sinhvien set diachi = 'ho chi minh' 
+where masinhvien = '1231020754';
+go
+
+--xóa thông tin của sinh viên 1231020754 = xóa bảng ghi (dòng) trong bảng sinh viên
+delete from sinhvien where masinhvien = '1231020754';
+
+select * from DangKyHocPhan
+--tìm khóa EXEC sp_helpconstraint
+--EXEC sp_helpconstraint 'monhoc'
+-- chèn giá trị mặc định: alter table SinhVien add default 'khong ten' for TenS
+
+SELECT COUNT(MaSinhVien) AS Tongso
+FROM DangKyHocPhan
+WHERE MaSinhVien = '1231022480';
